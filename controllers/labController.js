@@ -146,6 +146,9 @@ async function setPublicDelivery(req, res) {
     if (!lab) {
       return res.status(404).json("Lab not found");
     }
+    if (lab.role !== "LAB") {
+      return res.status(400).json("User is not lab");
+    }
     lab.publicDelivery = req.body.publicDelivery;
     await lab.save();
     return res.status(200).json(lab);
@@ -163,7 +166,7 @@ async function removeDocFromLabController(req, res) {
     if (!lab.docsId.includes(req.params.id)) {
       return res.status(404).json("Doctor Not Found in Lab");
     }
-    lab.docsId = lab.docsId.filter((doc) => doc !== req.params.id);
+    lab.docsId = lab.docsId.filter((doc) => doc.toString() !== req.params.id);
     await lab.save();
     return res.status(200).json(lab);
   } catch (error) {
