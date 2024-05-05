@@ -31,6 +31,43 @@ async function createOrderController(req, res) {
   }
 }
 
+async function editOrderController(req, res) {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json("Order Not Found");
+    }
+    if (order.status == "End") {
+      return res.status(400).json("Can't Order Ended Orders");
+    }
+    if (req.files) {
+      req.body.voiceNote = `http://127.0.0.1:3000/${req.files[0].filename}`;
+    }
+    const user = await User.findById(req.userId);
+    order.patientName = req.body.patientName
+      ? req.body.patientName
+      : order.patientName;
+    order.age = req.body.age ? req.body.age : order.age;
+    order.teethNo = req.body.teethNo ? req.body.teethNo : order.teethNo;
+    order.sex = req.body.sex ? req.body.sex : order.sex;
+    order.color = req.body.color ? req.body.color : order.color;
+    order.type = req.body.type ? req.body.type : order.type;
+    order.description = req.body.description
+      ? req.body.description
+      : order.description;
+    order.voiceNote = req.body.voiceNote ? req.body.voiceNote : order.voiceNote;
+    order.price = req.body.teethNo
+      ? req.body.teethNo *
+        user.labContract[req.body.type ? req.body.type : order.type]
+      : order.price;
+    await order.save();
+    return res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json("INTERNAL SERVER ERROR");
+  }
+}
+
 async function getOrdersController(req, res) {
   try {
     const orders = await Order.find({ doc_id: req.userId });
@@ -72,4 +109,5 @@ module.exports = {
   createOrderController,
   getOrdersController,
   getProfitsController,
+  editOrderController,
 };
