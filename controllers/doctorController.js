@@ -5,6 +5,9 @@ const { genUIDOrder } = require("../utils/genUIDOrder");
 async function createOrderController(req, res) {
   try {
     const user = await User.findById(req.userId).populate("labId");
+    if (!user.labId._id) {
+      return res.status(400).json("Doctor Not Registered On A Lab");
+    }
     const order = new Order({
       UID: await genUIDOrder(Order),
       patientName: req.body.patientName,
