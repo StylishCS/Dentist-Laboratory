@@ -9,7 +9,7 @@ async function createOrderController(req, res) {
       return res.status(400).json("Doctor Not Registered On A Lab");
     }
     if (req.files[0]) {
-      req.body.voiceNote = `http://127.0.0.1:3000/${req.files[0].filename}`;
+      req.body.voiceNote = `http://45.93.138.72:3000/${req.files[0].filename}`;
     }
     const order = new Order({
       UID: await genUIDOrder(Order),
@@ -45,7 +45,7 @@ async function editOrderController(req, res) {
       return res.status(400).json("Can't Order Ended Orders");
     }
     if (req.files) {
-      req.body.voiceNote = `http://127.0.0.1:3000/${req.files[0].filename}`;
+      req.body.voiceNote = `http://45.93.138.72:3000/${req.files[0].filename}`;
     }
     const user = await User.findById(req.userId);
     order.patientName = req.body.patientName
