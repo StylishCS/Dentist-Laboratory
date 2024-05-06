@@ -10,6 +10,7 @@ const {
   getProfitsController,
   setPublicDelivery,
   removeDocFromLabController,
+  getOrderByIdController,
 } = require("../controllers/labController");
 var router = express.Router();
 const isLab = require("../middlewares/isLab");
@@ -20,6 +21,7 @@ router.put("/contract/:id", isLab, updateDoctorContractController);
 router.get("/contract/:id", isLab, getDoctorContractController);
 
 router.get("/orders", isLab, getAllOrdersController);
+router.get("/orders/:id", isLab, getOrderByIdController);
 router.patch("/orders/:id", isLab, markOrderReadyController);
 router.patch("/orders/paid/:id", isLab, orderPaidController);
 
