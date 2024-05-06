@@ -130,27 +130,40 @@ async function orderPaidController(req, res) {
 
 async function getProfitsController(req, res) {
   try {
-    const orders = await Order.find({ lab_id: req.userId, status: "End" });
+    const orders = await Order.find({
+      lab_id: req.userId,
+      status: "End",
+    }).populate("doc_id", "username");
+
     if (!orders[0]) {
       return res.status(404).json("No Orders Available");
     }
-    let orderQuantity = orders.length;
-    const result = await Order.aggregate([
-      {
-        $group: {
-          _id: null,
-          totalPrice: { $sum: "$price" },
-          totalPaid: { $sum: "$paid" },
-        },
-      },
-    ]);
-    return res.status(200).json({
-      orders: orderQuantity,
-      totalPrice: result[0].totalPrice,
-      totalPaid: result[0].totalPaid,
-    });
+
+    const doctorProfits = {};
+
+    for (const order of orders) {
+      const doctorId = order.doc_id._id; // Assuming the doctor object is populated
+
+      if (!doctorProfits[doctorId]) {
+        doctorProfits[doctorId] = {
+          doctorId: doctorId,
+          doctorName: order.doc_id.username,
+          totalPrice: 0,
+          totalPaid: 0,
+        };
+      }
+
+      doctorProfits[doctorId].totalPrice += order.price;
+      doctorProfits[doctorId].totalPaid += order.paid;
+    }
+
+    // Convert object to array of values
+    const profitsArray = Object.values(doctorProfits);
+
+    return res.status(200).json(profitsArray);
   } catch (error) {
-    return res.status(200).json("INTERNAL SERVER ERROR");
+    console.error("Error: ", error);
+    return res.status(500).json("INTERNAL SERVER ERROR");
   }
 }
 
