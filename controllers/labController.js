@@ -150,11 +150,13 @@ async function getProfitsController(req, res) {
           doctorName: order.doc_id.username,
           totalPrice: 0,
           totalPaid: 0,
+          orderCount: 0,
         };
       }
 
       doctorProfits[doctorId].totalPrice += order.price;
       doctorProfits[doctorId].totalPaid += order.paid;
+      doctorProfits[doctorId].orderCount++;
     }
 
     // Convert object to array of values
