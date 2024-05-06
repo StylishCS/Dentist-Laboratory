@@ -80,6 +80,18 @@ async function getOrdersController(req, res) {
   }
 }
 
+async function getOrderByIdController(req, res) {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json("No Orders Found");
+    }
+    return res.status(200).json(order);
+  } catch (error) {
+    return res.status(500).json("INTERNAL SERVER ERROR");
+  }
+}
+
 async function getProfitsController(req, res) {
   try {
     const orders = await Order.find({ doc_id: req.userId, status: "End" });
@@ -110,4 +122,5 @@ module.exports = {
   getOrdersController,
   getProfitsController,
   editOrderController,
+  getOrderByIdController,
 };
