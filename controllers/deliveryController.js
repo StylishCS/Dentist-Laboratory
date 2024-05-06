@@ -5,12 +5,15 @@ async function getReadyOrders(req, res) {
   try {
     const orders = await Order.find({
       status: ["DocReady", "LabReady"],
-    }).populate("doc_id");
+    })
+      .populate("doc_id")
+      .populate("lab_id");
     if (!orders) {
       return res.status(404).json("No Ready Orders");
     }
     return res.status(200).json(orders);
   } catch (error) {
+    console.log(error);
     return res.status(500).json("INTERNAL SERVER ERROR");
   }
 }
@@ -19,7 +22,10 @@ async function getMyOrdersController(req, res) {
   try {
     const orders = await User.findById(req.userId)
       .select("delOrders")
-      .populate("delOrders");
+      .populate({
+        path: "delOrders",
+        populate: { path: "lab_id doc_id" },
+      });
     if (!orders.delOrders[0]) {
       return res.status(404).json("No Orders Available");
     }
@@ -92,6 +98,7 @@ async function takeOrderController(req, res) {
     await user.save();
     return res.status(200).json(order);
   } catch (error) {
+    console.log(error);
     return res.status(500).json("INTERNAL SERVER ERROR");
   }
 }

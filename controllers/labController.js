@@ -76,7 +76,9 @@ async function markOrderReadyController(req, res) {
 
 async function getAllOrdersController(req, res) {
   try {
-    const orders = await Order.find({ lab_id: req.userId });
+    const orders = await Order.find({ lab_id: req.userId })
+      .populate("lab_id")
+      .populate("doc_id");
     if (!orders[0]) {
       return res.status(404).json("No Orders Available");
     }

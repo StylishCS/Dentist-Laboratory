@@ -8,6 +8,9 @@ async function createOrderController(req, res) {
     if (!user.labId) {
       return res.status(400).json("Doctor Not Registered On A Lab");
     }
+    if (req.files[0]) {
+      req.body.voiceNote = `http://127.0.0.1:3000/${req.files[0].filename}`;
+    }
     const order = new Order({
       UID: await genUIDOrder(Order),
       patientName: req.body.patientName,
@@ -17,7 +20,7 @@ async function createOrderController(req, res) {
       color: req.body.color,
       type: req.body.type,
       description: req.body.description,
-      voiceNote: `http://127.0.0.1:3000/${req.files[0].filename}`,
+      voiceNote: req.body.voiceNote,
       price: req.body.teethNo * user.labContract[req.body.type],
       paid: 0,
       lab_id: user.labId._id,
@@ -27,6 +30,7 @@ async function createOrderController(req, res) {
     await order.save();
     return res.status(200).json(order);
   } catch (error) {
+    console.log(error);
     return res.status(500).json("INTERNAL SERVER ERROR");
   }
 }
