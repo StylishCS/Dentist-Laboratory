@@ -8,8 +8,16 @@ async function createOrderController(req, res) {
     if (!user.labId) {
       return res.status(400).json("Doctor Not Registered On A Lab");
     }
+    console.log(user.labContract);
     if (req.files[0]) {
-      req.body.voiceNote = `http://45.93.138.72:3000/${req.files[0].filename}`;
+      if (req.files[0].fieldname === "voiceNote") {
+        req.body.voiceNote = `http://45.93.138.72:3000/${req.files[0].filename}`;
+      }
+    }
+    if (req.files[1]) {
+      if (req.files[1].fieldname === "screen") {
+        req.body.screen = `http://45.93.138.72:3000/${req.files[1].filename}`;
+      }
     }
     const order = new Order({
       UID: await genUIDOrder(Order),
@@ -21,6 +29,7 @@ async function createOrderController(req, res) {
       type: req.body.type,
       description: req.body.description,
       voiceNote: req.body.voiceNote,
+      screen: req.body.screen,
       price: req.body.teethNo * user.labContract[req.body.type],
       paid: 0,
       lab_id: user.labId._id,
